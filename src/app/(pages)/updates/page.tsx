@@ -1,6 +1,7 @@
 export default function UpdatesPage() {
   return (
     <>
+      {/*  */}
       <h1 className="text-2xl font-bold font-serif text-foreground sm:text-3xl">
         Updates Page
       </h1>
