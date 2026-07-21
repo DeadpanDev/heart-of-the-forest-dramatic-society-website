@@ -1,0 +1,168 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String   @id
+  name          String
+  email         String
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 🛡️ Custom field to distinguish regular members from Trustee Admins
+  role UserRole @default(USER)
+
+  // Relationships
+  sessions Session[]
+  accounts Account[]
+  notices  Notice[] // Track notices written by this admin/trustee
+
+  @@unique([email])
+  @@map("user")
+}
+
+enum UserRole {
+  USER // Regular members / site visitors
+  TRUSTEE // Administrative crew with access to the "/admin" cockpit
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// =========================================================================
+// 🎭 DRAMATIC SOCIETY FUNCTIONAL MODELS (Using string IDs to align cleanly)
+// =========================================================================
+
+/// 📢 Modeled for the `/updates` feed & Home Banner Alert system
+model Notice {
+  id        String     @id @default(cuid())
+  title     String
+  content   String     @db.Text
+  type      NoticeType @default(NEWS)
+  isPinned  Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  // Linked directly to Better Auth's User ID (User must have TRUSTEE role)
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([type, createdAt])
+  @@map("notice")
+}
+
+enum NoticeType {
+  NEWS
+  HELP_NEEDED
+  ALERT
+}
+
+/// ✍️ Modeled for the `/volunteer` sign-up intake portal
+model VolunteerSubmission {
+  id        String           @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  status    SubmissionStatus @default(PENDING)
+  notes     String?          @db.Text
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  interests VolunteerInterest[]
+
+  @@index([status, createdAt])
+  @@map("volunteer_submission")
+}
+
+enum SubmissionStatus {
+  PENDING
+  REVIEWED
+  ARCHIVED
+}
+
+/// 🎫 Standardized list of department choices (Acting, Costumes, Lighting)
+model InterestArea {
+  id         String              @id @default(cuid())
+  name       String              @unique
+  slug       String              @unique
+  volunteers VolunteerInterest[]
+
+  @@map("interest_area")
+}
+
+/// Join table linking volunteer applications to their specific interest areas
+model VolunteerInterest {
+  submissionId   String
+  interestAreaId String
+  submission     VolunteerSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  interestArea   InterestArea        @relation(fields: [interestAreaId], references: [id], onDelete: Cascade)
+
+  @@id([submissionId, interestAreaId])
+  @@map("volunteer_interest")
+}
+
+/// 🎫 Modeled for the Global Ticket Control Toggle configuration
+model SystemSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("system_setting")
+}
