@@ -36,6 +36,7 @@ export default function RootLayout({
         alice.variable,
         plusJakartaSans.variable,
       )}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
