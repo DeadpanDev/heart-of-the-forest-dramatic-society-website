@@ -1,0 +1,17 @@
+services:
+  # 🐘 The Database Engine
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: hotf_dev_db
+    environment:
+      POSTGRES_USER: trustee_admin
+      POSTGRES_PASSWORD: forest_secret_password
+      POSTGRES_DB: heart_of_the_forest
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+volumes:
+  postgres_data:
+    driver: local
