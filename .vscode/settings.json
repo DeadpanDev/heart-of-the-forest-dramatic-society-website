@@ -2,5 +2,6 @@
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "css.lint.unknownAtRules": "ignore",
   "js/ts.experimental.useTsgo": false,
-  "snyk.advanced.autoSelectOrganization": true
+  "snyk.advanced.autoSelectOrganization": false,
+  "snyk.advanced.organization": "c788886f-9f9c-47dd-b93f-b691d54d4fa5"
 }
