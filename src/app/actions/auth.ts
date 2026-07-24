@@ -9,7 +9,11 @@ export async function VerifyTrustee() {
     headers: await headers(),
   });
 
-  if (!session || session.user.role !== "TRUSTEE") {
+  if (!session) {
+    redirect("/login");
+  }
+
+  if (!session?.user?.role?.includes("trustee")) {
     redirect("/login");
   }
 }
