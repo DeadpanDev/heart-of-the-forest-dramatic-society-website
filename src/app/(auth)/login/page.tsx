@@ -29,10 +29,7 @@ export default function LoginPage() {
         return;
       }
 
-      setTimeout(() => {
-        router.replace("/admin");
-        router.refresh();
-      }, 1500);
+      router.push("/admin");
     } catch (err) {
       setError("An unexpected error occurred.");
     } finally {
