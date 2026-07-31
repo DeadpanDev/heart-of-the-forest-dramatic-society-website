@@ -36,4 +36,9 @@ export const auth = betterAuth({
     enabled: true,
   },
   plugins: [nextCookies()],
+  rateLimit: {
+    enabled: true,
+    windowMs: 60 * 1000, // 1 minute
+    max: 10, // limit each IP to 10 requests per windowMs
+  },
 });
