@@ -1,4 +1,4 @@
-import { signOutAction } from "@/app/actions/auth";
+import { signOutAction, TRUSTEEVerifyAction } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
@@ -17,10 +17,7 @@ async function AdminContent() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-
-  if (!session) {
-    unauthorized();
-  }
+  await TRUSTEEVerifyAction();
 
   return (
     <>
@@ -31,6 +28,7 @@ async function AdminContent() {
         This is the admin page. Here you can manage the content and settings of
         the Heart of the Forest Dramatic Society website.
       </p>
+      <p>Welcome, {session?.user.id}!</p>
       <form action={signOutAction}>
         <Button type="submit">Sign Out</Button>
       </form>

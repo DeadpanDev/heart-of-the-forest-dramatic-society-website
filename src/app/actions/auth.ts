@@ -15,8 +15,6 @@ export async function signInAction(formData: FormData) {
     },
     asResponse: true,
   });
-
-  return redirect("/admin");
 }
 
 export async function signOutAction() {
@@ -24,4 +22,14 @@ export async function signOutAction() {
     headers: await headers(),
   });
   return redirect("/");
+}
+
+export async function TRUSTEEVerifyAction() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session || session.user.role !== "TRUSTEE") {
+    return redirect("/login");
+  }
 }
