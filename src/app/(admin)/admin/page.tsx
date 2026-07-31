@@ -28,7 +28,7 @@ async function AdminContent() {
         This is the admin page. Here you can manage the content and settings of
         the Heart of the Forest Dramatic Society website.
       </p>
-      <p>Welcome, {session?.user.id}!</p>
+      <p>Welcome, {session?.user.name}!</p>
       <form action={signOutAction}>
         <Button type="submit">Sign Out</Button>
       </form>

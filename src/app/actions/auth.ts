@@ -3,10 +3,18 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import zod from "zod";
 
 export async function signInAction(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+
+  const schema = zod.object({
+    email: zod.string().email(),
+    password: zod.string().min(6),
+  });
+
+  schema.parse({ email, password });
 
   await auth.api.signInEmail({
     body: {
@@ -14,7 +22,10 @@ export async function signInAction(formData: FormData) {
       password,
     },
     asResponse: true,
+    headers: await headers(),
   });
+
+  return redirect("/admin");
 }
 
 export async function signOutAction() {

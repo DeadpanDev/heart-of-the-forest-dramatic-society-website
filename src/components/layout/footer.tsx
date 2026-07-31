@@ -1,4 +1,7 @@
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import Link from "next/link";
+import { Suspense } from "react";
 
 async function getCurrentYear() {
   "use cache";
@@ -6,6 +9,14 @@ async function getCurrentYear() {
 }
 
 export default async function Footer() {
+  return (
+    <Suspense fallback={null}>
+      <FooterContent />
+    </Suspense>
+  );
+}
+
+async function FooterContent() {
   const currentYear = await getCurrentYear();
   return (
     <footer className="border-t border-border bg-card px-fluid-md py-fluid-sm">
