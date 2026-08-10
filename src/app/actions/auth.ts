@@ -16,16 +16,26 @@ export async function signInAction(formData: FormData) {
 
   schema.parse({ email, password });
 
+  const requestHeaders = await headers();
+
   await auth.api.signInEmail({
     body: {
       email,
       password,
     },
     asResponse: true,
-    headers: await headers(),
+    headers: requestHeaders,
   });
 
-  return redirect("/admin");
+  const session = await auth.api.getSession({
+    headers: requestHeaders,
+  });
+
+  if (session?.user.role === "TRUSTEE") {
+    return redirect("/admin");
+  }
+
+  return redirect("/");
 }
 
 export async function signOutAction() {
