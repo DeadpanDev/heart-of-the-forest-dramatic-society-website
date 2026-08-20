@@ -10,7 +10,7 @@ export async function signInAction(formData: FormData) {
   const password = formData.get("password") as string;
 
   const schema = zod.object({
-    email: zod.string().email(),
+    email: zod.email(),
     password: zod.string().min(6),
   });
 
